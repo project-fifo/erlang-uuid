@@ -53,7 +53,7 @@
          to_uuid_urn/1,
          uuid1/0, uuid1/2,
          uuid3/2,
-         uuid4/0,
+         uuid4/0, uuid4s/0,
          uuid5/2,
          variant/1,
          version/1,
@@ -173,6 +173,8 @@ uuid4() ->
 
     <<U0:32, U1:16, ?UUIDv4:4, U2:12, ?VARIANT10:2, U3:30, U4:32>>.
 
+uuid4s() ->
+    list_to_binary(to_string(uuid4())).
 
 %% =============================================================================
 %% UUID v5
@@ -207,6 +209,16 @@ uuid5(_, _) ->
 %% @private
 %% @doc  Create a UUID v3 or v5 (name based) from binary, using MD5 or SHA1
 %%       respectively.
+-ifndef(old_hash).
+-spec create_namebased_uuid(HashFunction::md5 | sha1,
+                            Data::binary()) -> uuid().
+create_namebased_uuid(md5, Data) ->
+    Md5 = crypto:hash(md5, Data),
+    compose_namebased_uuid(?UUIDv3, Md5);
+create_namebased_uuid(sha1, Data) ->
+    <<Sha1:128, _:32>> = crypto:hash(sha, Data),
+    compose_namebased_uuid(?UUIDv5, <<Sha1:128>>).
+-else.
 -spec create_namebased_uuid(HashFunction::md5 | sha1,
                             Data::binary()) -> uuid().
 create_namebased_uuid(md5, Data) ->
@@ -215,7 +227,7 @@ create_namebased_uuid(md5, Data) ->
 create_namebased_uuid(sha1, Data) ->
     <<Sha1:128, _:32>> = crypto:sha(Data),
     compose_namebased_uuid(?UUIDv5, <<Sha1:128>>).
-
+-endif.
 %% @private
 %% @doc  Compose a namebased UUID (v3 or v5) with input hashed data.
 -spec compose_namebased_uuid(Version::3 | 5, Hash::binary()) -> uuid().
