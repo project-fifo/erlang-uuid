@@ -93,7 +93,7 @@ uuid1(NodeArg, ClockSeqArg) ->
 
 %% @private
 %% @doc Get nanosecond timestamp.
--spec uuid1_time() -> binary().
+-spec uuid1_time() -> <<_:60>>.
 uuid1_time() ->
     %% Transform unix epoch to 100 nanosecond intervals since 15 October 1582
     %% by adding offset to unix epoch and transforming microseconds epoch to
@@ -107,7 +107,7 @@ uuid1_time() ->
 
 %% @private
 %% @doc Use ClockSeq if supplied otherwise Generate random clock sequence.
--spec uuid1_clockseq(null | binary()) -> binary().
+-spec uuid1_clockseq(null | binary()) -> <<_:14>>.
 uuid1_clockseq(null) ->
     random:seed(now_xor_pid()),
     Rnd = random:uniform(2 bsl 14 - 1),
@@ -129,7 +129,7 @@ uuid1_node(NodeArg) -> NodeArg.
 %% @doc  Create a UUID v3 (name based, MD5 is hashing function) as a binary.
 %%       Magic numbers are from Appendix C of the RFC 4122.
 -spec uuid3(NamespaceOrUuid::atom() | uuid_string() | uuid(),
-            Name::string()) -> uuid().
+            Name::string() | binary()) -> uuid().
 uuid3(dns, Name) ->
     create_namebased_uuid(md5,
         list_to_binary([<<16#6ba7b8109dad11d180b400c04fd430c8:128>>, Name]));
@@ -183,7 +183,7 @@ uuid4s() ->
 %% @doc  Create a UUID v5 (name based, SHA1 is hashing function) as a binary.
 %%       Magic numbers are from Appendix C of the RFC 4122.
 -spec uuid5(NamespaceOrUuid::atom() | uuid_string() | uuid(),
-            Name::string()) -> uuid().
+            Name::string() | binary()) -> uuid().
 uuid5(dns, Name) ->
     create_namebased_uuid(sha1,
         list_to_binary([<<16#6ba7b8109dad11d180b400c04fd430c8:128>>, Name]));
