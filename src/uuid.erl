@@ -98,9 +98,7 @@ uuid1_time() ->
     %% Transform unix epoch to 100 nanosecond intervals since 15 October 1582
     %% by adding offset to unix epoch and transforming microseconds epoch to
     %% nanoseconds.
-    {MegaSeconds, Seconds, MicroSeconds} = now(),
-    UnixEpoch =
-        (MegaSeconds * 1000000000000 + Seconds * 1000000 + MicroSeconds),
+    UnixEpoch = erlang:system_time(micro_seconds),
     Timestamp = ?nanosecond_intervals_offset +
         ?nanosecond_intervals_factor * UnixEpoch,
     <<Timestamp:60>>.
